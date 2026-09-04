@@ -32,11 +32,18 @@ $git = (Get-Command git.exe -ErrorAction Stop).Source
 
 $auth = Invoke-Native -FilePath $gh -Arguments @('auth','status') -Capture -AllowFailure
 if ($auth.ExitCode -ne 0) {
-    Write-Host 'GitHub sign-in is required. A browser window may open.' -ForegroundColor Yellow
+    Write-Host 'GitHub sign-in is required. A browser window will open.' -ForegroundColor Yellow
+    Write-Host 'Complete the GitHub authorization in the browser, then return to this window.' -ForegroundColor Yellow
     Invoke-Native -FilePath $gh -Arguments @('auth','login','--hostname','github.com','--git-protocol','https','--web') | Out-Null
 }
+
+# A valid gh login does not always mean native Git can clone private HTTPS repositories.
+# Configure Git's credential helper explicitly before touching the private control repo.
+Invoke-Native -FilePath $gh -Arguments @('auth','setup-git') | Out-Null
+
 $login = ((Invoke-Native -FilePath $gh -Arguments @('api','user','--jq','.login') -Capture).Output | Out-String).Trim()
 if ([string]::IsNullOrWhiteSpace($login)) { throw 'Could not determine the authenticated GitHub username.' }
+Write-Host "Authenticated GitHub user: $login" -ForegroundColor Green
 $controlFullName = "$login/$ControlRepoName"
 $view = Invoke-Native -FilePath $gh -Arguments @('repo','view',$controlFullName,'--json','visibility','--jq','.visibility') -Capture -AllowFailure
 if ($view.ExitCode -ne 0) {
@@ -45,6 +52,7 @@ if ($view.ExitCode -ne 0) {
 } else {
     $visibility = (($view.Output | Out-String).Trim()).ToUpperInvariant()
     if ($visibility -ne 'PRIVATE') { throw "Refusing to use $controlFullName because it is $visibility. The GPT Controller control repository must be PRIVATE." }
+    Write-Host "Using existing PRIVATE control repository: $controlFullName" -ForegroundColor Cyan
 }
 
 & (Join-Path $PSScriptRoot 'install.ps1') -InstallRoot $InstallRoot -Python $Python -AgentId $AgentId
