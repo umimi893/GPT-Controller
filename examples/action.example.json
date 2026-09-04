@@ -1,0 +1,21 @@
+{
+  "protocol": "q-agent-v4",
+  "id": "example-status-001",
+  "target": {
+    "mode": "any"
+  },
+  "requires": [
+    "git"
+  ],
+  "workspace": "scratch",
+  "steps": [
+    {
+      "type": "git.exec",
+      "args": [
+        "status",
+        "--short",
+        "--branch"
+      ]
+    }
+  ]
+}

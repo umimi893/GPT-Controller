@@ -1,0 +1,42 @@
+{
+  "agent_id": "worker-pc",
+  "capabilities": [
+    "general",
+    "git",
+    "browser",
+    "windows-ui"
+  ],
+  "control_repo": "C:/GPT-Controller/control",
+  "remote": "origin",
+  "branch": "gpt-controller-control",
+  "poll_seconds": 3,
+  "powershell": "pwsh",
+  "git": "git",
+  "default_timeout_seconds": 300,
+  "max_output_bytes": 2000000,
+  "allow_absolute_paths": false,
+  "interaction_policy": {
+    "non_interference": false,
+    "allow_physical_input": true,
+    "allow_foreground_activation": true,
+    "allow_visible_gui_launch": true
+  },
+  "interactive_host": {
+    "spool": "C:/ProgramData/GPT-Controller/interactive",
+    "timeout_seconds": 120
+  },
+  "workspaces": {
+    "scratch": "C:/GPT-Controller/scratch"
+  },
+  "managed_git_workspaces": [],
+  "managed_git_expected_branches": {},
+  "browser": {
+    "user_data_dir": "C:/GPT-Controller/browser-profile",
+    "channel": null,
+    "headless_only": false,
+    "cdp_endpoint": "http://127.0.0.1:9222",
+    "interactive_user_data_dir": "C:/GPT-Controller/browser-interactive-profile",
+    "interactive_executable": null
+  },
+  "deploy_profiles": {}
+}

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://q-agent-v4.local/schema/action-v4.json",
+  "title": "GPT Controller Action",
+  "type": "object",
+  "required": ["protocol", "id", "steps"],
+  "properties": {
+    "protocol": {"const": "q-agent-v4"},
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "target_agent": {"type": "string"},
+    "target": {
+      "oneOf": [
+        {"type": "object", "required": ["mode"], "properties": {"mode": {"const": "any"}}, "additionalProperties": true},
+        {"type": "object", "required": ["mode", "agent"], "properties": {"mode": {"const": "agent"}, "agent": {"type": "string", "minLength": 1}}, "additionalProperties": true},
+        {"type": "object", "required": ["mode", "order"], "properties": {"mode": {"const": "ordered"}, "order": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}, "fallback_after_seconds": {"type": "integer", "minimum": 0, "maximum": 3600}}, "additionalProperties": true}
+      ]
+    },
+    "requires": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "workspace": {"type": "string"},
+    "timeout_seconds": {"type": "integer", "minimum": 1, "maximum": 86400},
+    "resume_from_checkpoint": {"type": "boolean"},
+    "resume_attempts": {"type": "integer", "minimum": 1, "maximum": 10},
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": {
+            "enum": [
+              "noop", "agent.info", "powershell.exec", "process.exec",
+              "file.read", "file.write", "file.append", "file.mkdir",
+              "file.delete", "file.copy", "file.move", "git.exec",
+              "workspace.git_sync", "browser.playwright", "browser.interactive",
+              "windows.ui", "download.wait", "desktop.checkpoint", "desktop.loop", "deploy.exec"
+            ]
+          },
+          "continue_on_error": {"type": "boolean"},
+          "timeout_seconds": {"type": "integer", "minimum": 1, "maximum": 86400}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"target": {"properties": {"mode": {"const": "ordered"}}, "required": ["mode"]}}, "required": ["target"]},
+      "then": {"required": ["created_at"]}
+    }
+  ],
+  "additionalProperties": true
+}

@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gpt-controller-runtime"
+version = "4.0.0"
+description = "GPT Controller: production Git-mediated remote execution runtime controlled by ChatGPT"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+browser = ["playwright>=1.46"]
+windows-ui = ["pywinauto>=0.6.9", "Pillow>=10"]
+all = ["playwright>=1.46", "pywinauto>=0.6.9", "Pillow>=10", "pytest>=8"]
+
+[project.scripts]
+gpt-controller = "agent_runtime.cli:main"
+gpt-controller-interactive = "agent_runtime.interactive_host:main"
+q-agent-v4 = "agent_runtime.cli:main"
+q-agent-v4-interactive = "agent_runtime.interactive_host:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
